@@ -73,6 +73,38 @@ describe('API', function() {
     });
   });
 
+  describe('GET all envelopes', function() {
+    it('returns status code 200', function(done) {
+      request(server.expressApp)
+          .get('/api/envelopes')
+          .expect(200, done);
+    });
+
+    it('returns an array with status 200', function() {
+      return request(server.expressApp)
+          .get('/api/envelopes')
+          .expect(200)
+          .then((res) => {
+            const envelopes = res.body;
+            expect(envelopes).to.be.an.instanceOf(Array);
+          });
+    });
+
+    it('returns an array of well formed envelope objects', function() {
+      return request(server.expressApp)
+          .get('/api/envelopes')
+          .expect(200)
+          .then((res) => {
+            const envelopes = res.body;
+            envelopes.forEach((envelope) => {
+              expect(envelope).to.have.ownProperty('id');
+              expect(envelope).to.have.ownProperty('category');
+              expect(envelope).to.have.ownProperty('limit');
+            });
+          });
+    });
+  });
+
   describe('POST new envelope', function() {
     const validEnvelope = {
       category: 'New category',

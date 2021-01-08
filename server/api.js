@@ -3,6 +3,10 @@ const {getElementById, getNewId} = require('./utils.js');
 const {envelopes} = require('./data.js');
 const apiRouter = new express.Router();
 
+apiRouter.get('/envelopes', (req, res) => {
+  res.status(200).send(envelopes);
+});
+
 apiRouter.get('/envelopes/:id', (req, res) => {
   const id = Number(req.params.id);
   if (id) {
