@@ -55,3 +55,5 @@ const envelopes = [
     limit: 100,
   },
 ];
+
+let salary = 2000;
