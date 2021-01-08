@@ -115,11 +115,10 @@ describe('API', function() {
           .expect(400, done);
     });
 
-
     it('returns 400 if post without an envelope', function(done) {
       request(server.expressApp)
           .post('/api/envelopes')
           .expect(400, done);
     });
   });
-}); ;
+});
