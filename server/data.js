@@ -57,3 +57,5 @@ const envelopes = [
 ];
 
 let salary = 2000;
+
+module.exports = {envelopes, salary};
