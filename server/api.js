@@ -1,5 +1,5 @@
 const express = require('express');
-const {getElementById} = require('./utils.js');
+const {getElementById, getNewId} = require('./utils.js');
 const {envelopes} = require('./data.js');
 const apiRouter = new express.Router();
 
@@ -15,6 +15,23 @@ apiRouter.get('/envelopes/:id', (req, res) => {
   } else {
     res.status(400).send();
   }
+});
+
+const validateEnvelope = (req, res, next) => {
+  const envelope = req.body;
+  if (envelope.category && envelope.limit) {
+    req.envelope = envelope;
+    next();
+  } else {
+    res.status(400).send();
+  }
+};
+
+apiRouter.post('/envelopes', validateEnvelope, (req, res) => {
+  const envelope = req.envelope;
+  envelope.id = getNewId(envelopes);
+  envelopes.push(envelope);
+  res.status(201).send(envelope);
 });
 
 module.exports = apiRouter;
