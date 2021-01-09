@@ -218,8 +218,31 @@ describe('API', function() {
     it('returns 400 if withdraw is missing', function() {
       return request(server.expressApp)
           .post('/api/envelopes/5/withdraw/500')
-
           .expect(400);
+    });
+  });
+
+  describe('DELETE an envelope', function() {
+    it('returns status code 204', function(done) {
+      request(server.expressApp)
+          .delete('/api/envelopes/5')
+          .expect(204, done);
+    });
+
+    it('returns status 204 and deletes an envelope', async function() {
+      await request(server.expressApp)
+          .delete('/api/envelopes/7')
+          .expect(204);
+
+      await request(server.expressApp)
+          .get('/api/envelopes/7')
+          .expect(404);
+    });
+
+    it('returns 404 if the envelope does not exist', function(done) {
+      request(server.expressApp)
+          .delete('/api/envelopes/73')
+          .expect(404, done);
     });
   });
 });
