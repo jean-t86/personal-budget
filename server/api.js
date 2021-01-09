@@ -38,4 +38,25 @@ apiRouter.post('/envelopes', validateEnvelope, (req, res) => {
   res.status(201).send(envelope);
 });
 
+apiRouter.post('/envelopes/:id/withdraw/:amount', (req, res) => {
+  const id = Number(req.params.id);
+  if (id) {
+    const envelope = getElementById(envelopes, id);
+    if (envelope) {
+      const withdraw = Number(req.params.amount);
+      if (withdraw < envelope.balance) {
+        const balance = envelope.balance - withdraw;
+        envelope.balance = balance;
+        res.status(200).send(envelope);
+      } else {
+        res.status(400).send(envelope);
+      }
+    } else {
+      res.status(404).send();
+    }
+  } else {
+    res.status(400).send();
+  }
+});
+
 module.exports = apiRouter;

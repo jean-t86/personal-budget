@@ -153,4 +153,73 @@ describe('API', function() {
           .expect(400, done);
     });
   });
+
+  describe('POST to substract from balance on an envelope', function() {
+    it('returns status code 200', function(done) {
+      request(server.expressApp)
+          .post('/api/envelopes/4/withdraw/50')
+          .expect(200, done);
+    });
+
+    it('returns status code 404 if id is not found', function(done) {
+      request(server.expressApp)
+          .post('/api/envelopes/48/withdraw/50')
+          .expect(404, done);
+    });
+
+    it('returns 400 if the id is not numeric', function(done) {
+      request(server.expressApp)
+          .post('/api/envelopes/fsdf/withdraw/50')
+          .expect(400, done);
+    });
+
+    it('updates and return balance on withdraw', async function() {
+      let initBalance;
+      await request(server.expressApp)
+          .get('/api/envelopes/3')
+          .expect(200)
+          .then((res) => {
+            initBalance = res.body.balance;
+            assert.ok(initBalance);
+          });
+
+      await request(server.expressApp)
+          .post('/api/envelopes/3/withdraw/50')
+          .expect(200);
+
+      let updatedBalance;
+      await request(server.expressApp)
+          .get('/api/envelopes/3')
+          .expect(200)
+          .then((res) => {
+            updatedBalance = res.body.balance;
+            assert.ok(updatedBalance);
+            assert.ok(initBalance > updatedBalance);
+          });
+    });
+
+    it('returns 400 and balance if cannot withdraw', function() {
+      const withdraw = 400;
+      return request(server.expressApp)
+          .post(`/api/envelopes/5/withdraw/${withdraw}`)
+          .expect(400)
+          .then((res) => {
+            const balance = res.body.balance;
+            assert.ok(balance < withdraw);
+          });
+    });
+
+    it('returns 400 if withdraw is not a number', function() {
+      return request(server.expressApp)
+          .post('/api/envelopes/5/withdraw/df')
+          .expect(400);
+    });
+
+    it('returns 400 if withdraw is missing', function() {
+      return request(server.expressApp)
+          .post('/api/envelopes/5/withdraw/500')
+
+          .expect(400);
+    });
+  });
 });
