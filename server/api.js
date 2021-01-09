@@ -1,5 +1,5 @@
 const express = require('express');
-const {getElementById, getNewId} = require('./utils.js');
+const {getElementById, getNewId, getIndexById} = require('./utils.js');
 const {envelopes} = require('./data.js');
 const apiRouter = new express.Router();
 
@@ -57,6 +57,12 @@ apiRouter.param('amount', (req, res, next) => {
 
 apiRouter.post('/envelopes/:id/withdraw/:amount', (req, res) => {
   res.status(200).send(req.body.envelope);
+});
+
+apiRouter.delete('/envelopes/:id', (req, res) => {
+  const index = getIndexById(envelopes, req.body.envelope.id);
+  envelopes.splice(index, 1);
+  res.status(204).send();
 });
 
 module.exports = apiRouter;
