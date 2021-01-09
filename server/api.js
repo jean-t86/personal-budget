@@ -23,7 +23,7 @@ apiRouter.get('/envelopes/:id', (req, res) => {
 
 const validateEnvelope = (req, res, next) => {
   const envelope = req.body;
-  if (envelope.category && envelope.limit) {
+  if (envelope.category && envelope.balance) {
     req.envelope = envelope;
     next();
   } else {

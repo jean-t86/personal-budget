@@ -43,7 +43,7 @@ describe('API', function() {
             const envelope = res.body;
             expect(envelope).to.have.ownProperty('id');
             expect(envelope).to.have.ownProperty('category');
-            expect(envelope).to.have.ownProperty('limit');
+            expect(envelope).to.have.ownProperty('balance');
           });
     });
 
@@ -99,7 +99,7 @@ describe('API', function() {
             envelopes.forEach((envelope) => {
               expect(envelope).to.have.ownProperty('id');
               expect(envelope).to.have.ownProperty('category');
-              expect(envelope).to.have.ownProperty('limit');
+              expect(envelope).to.have.ownProperty('balance');
             });
           });
     });
@@ -108,12 +108,12 @@ describe('API', function() {
   describe('POST new envelope', function() {
     const validEnvelope = {
       category: 'New category',
-      limit: 125,
+      balance: 125,
     };
 
     const invalidEnvelope = {
       category: '',
-      limit: null,
+      balance: null,
     };
 
     it('returns 201', function(done) {
@@ -137,7 +137,7 @@ describe('API', function() {
       const getEnvelope = getRes.body;
 
       assert.deepEqual(getEnvelope.id, newId);
-      assert.notEqual(newId, undefined);
+      assert.ok(newId);
     });
 
     it('returns 400 if post an invalid envelope', function(done) {
