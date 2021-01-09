@@ -7,18 +7,23 @@ apiRouter.get('/envelopes', (req, res) => {
   res.status(200).send(envelopes);
 });
 
-apiRouter.get('/envelopes/:id', (req, res) => {
+apiRouter.param('id', (req, res, next) => {
   const id = Number(req.params.id);
   if (id) {
     const envelope = getElementById(envelopes, id);
     if (envelope) {
-      res.status(200).send(envelope);
+      req.body.envelope = envelope;
+      next();
     } else {
       res.status(404).send();
     }
   } else {
     res.status(400).send();
   }
+});
+
+apiRouter.get('/envelopes/:id', (req, res) => {
+  res.status(200).send(req.body.envelope);
 });
 
 const validateEnvelope = (req, res, next) => {
@@ -38,25 +43,20 @@ apiRouter.post('/envelopes', validateEnvelope, (req, res) => {
   res.status(201).send(envelope);
 });
 
-apiRouter.post('/envelopes/:id/withdraw/:amount', (req, res) => {
-  const id = Number(req.params.id);
-  if (id) {
-    const envelope = getElementById(envelopes, id);
-    if (envelope) {
-      const withdraw = Number(req.params.amount);
-      if (withdraw < envelope.balance) {
-        const balance = envelope.balance - withdraw;
-        envelope.balance = balance;
-        res.status(200).send(envelope);
-      } else {
-        res.status(400).send(envelope);
-      }
-    } else {
-      res.status(404).send();
-    }
+apiRouter.param('amount', (req, res, next) => {
+  const withdraw = Number(req.params.amount);
+  const envelope = req.body.envelope;
+  if (withdraw < envelope.balance) {
+    envelope.balance -= withdraw;
+    req.body.envelope = envelope;
+    next();
   } else {
-    res.status(400).send();
+    res.status(400).send(envelope);
   }
+});
+
+apiRouter.post('/envelopes/:id/withdraw/:amount', (req, res) => {
+  res.status(200).send(req.body.envelope);
 });
 
 module.exports = apiRouter;
