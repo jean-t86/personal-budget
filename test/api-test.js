@@ -245,4 +245,56 @@ describe('API', function() {
           .expect(404, done);
     });
   });
+
+  describe('POST to transfer budget from one envelope to another', function() {
+    it('returns status code 200', function(done) {
+      request(server.expressApp)
+          .post('/api/envelopes/9/3/50')
+          .expect(200, done);
+    });
+
+    it('transfers amount to other envelope', async function() {
+      const from = 4;
+      const to = 8;
+      const amount = 30;
+
+      let initAmountA;
+      await request(server.expressApp)
+          .get(`/api/envelopes/${from}`)
+          .expect(200)
+          .then((res) => {
+            initAmountA = res.body.balance;
+          });
+
+      let initAmountB;
+      await request(server.expressApp)
+          .get(`/api/envelopes/${to}`)
+          .expect(200)
+          .then((res) => {
+            initAmountB = res.body.balance;
+          });
+
+      await request(server.expressApp)
+          .post(`/api/envelopes/${from}/${to}/${amount}`)
+          .expect(200);
+
+      let updatedAmountA;
+      await request(server.expressApp)
+          .get(`/api/envelopes/${from}`)
+          .expect(200)
+          .then((res) => {
+            updatedAmountA = res.body.balance;
+            assert.equal(updatedAmountA, initAmountA - amount);
+          });
+
+      let updatedAmountB;
+      await request(server.expressApp)
+          .get(`/api/envelopes/${to}`)
+          .expect(200)
+          .then((res) => {
+            updatedAmountB = res.body.balance;
+            assert.equal(updatedAmountB, initAmountB + amount);
+          });
+    });
+  });
 });
